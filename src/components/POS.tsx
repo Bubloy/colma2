@@ -225,7 +225,7 @@ export const POS: React.FC<POSProps> = ({ addToast }) => {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`btn ${selectedCategory === cat ? 'btn-cyan' : 'btn-secondary'}`}
+              className={`btn ${selectedCategory === cat ? 'btn-primary' : 'btn-secondary'}`}
               style={{ padding: '6px 14px', borderRadius: '20px', fontSize: '13px' }}
             >
               {cat}
@@ -257,12 +257,12 @@ export const POS: React.FC<POSProps> = ({ addToast }) => {
       </div>
 
       {/* Cart and checkout panel */}
-      <div className="glass-card accent-cyan" style={{ borderTopRightRadius: '16px', borderBottomRightRadius: '16px' }}>
+      <div className="glass-card accent-primary" style={{ borderTopRightRadius: '16px', borderBottomRightRadius: '16px' }}>
         <div className="cart-container">
           <div style={{ borderBottom: '1px solid var(--glass-border)', paddingBottom: '12px', marginBottom: '12px' }}>
             <h3 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>Carrito de Compras</span>
-              <span className="badge badge-cyan">{cart.reduce((a, b) => a + b.quantity, 0)} Items</span>
+              <span className="badge badge-primary">{cart.reduce((a, b) => a + b.quantity, 0)} Items</span>
             </h3>
           </div>
 
@@ -411,7 +411,7 @@ export const POS: React.FC<POSProps> = ({ addToast }) => {
 
             <button
               type="submit"
-              className="btn btn-cyan"
+              className="btn btn-primary"
               style={{ width: '100%', marginTop: '14px', height: '48px', fontSize: '16px' }}
               disabled={!state.currentJournalId || cart.length === 0}
             >

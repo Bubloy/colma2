@@ -182,7 +182,7 @@ export const DeliveryDashboard: React.FC<DeliveryProps> = ({ addToast }) => {
                   />
                 </div>
 
-                <button type="submit" className="btn btn-cyan" style={{ width: '100%', height: '40px', fontSize: '13px' }}>
+                <button type="submit" className="btn btn-primary" style={{ width: '100%', height: '40px', fontSize: '13px' }}>
                   🏍️ Despachar a Ruta de Entrega
                 </button>
               </form>
@@ -191,7 +191,7 @@ export const DeliveryDashboard: React.FC<DeliveryProps> = ({ addToast }) => {
         )}
 
         {/* Deliveries list container */}
-        <div className="glass-card accent-cyan" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="glass-card accent-primary" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2>
               {state.activeRole === 'Delivery' ? 'Mis Entregas Asignadas' : 'Estatus General de Delivery'}
@@ -238,7 +238,7 @@ export const DeliveryDashboard: React.FC<DeliveryProps> = ({ addToast }) => {
                   >
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-                        <span style={{ fontWeight: 'bold', fontSize: '15px', color: '#FFF' }}>
+                        <span style={{ fontWeight: 'bold', fontSize: '15px', color: 'var(--text-primary)' }}>
                           Para: {delivery.clientName}
                         </span>
                         <span className={`badge ${badgeClass}`}>{delivery.status}</span>
@@ -253,7 +253,7 @@ export const DeliveryDashboard: React.FC<DeliveryProps> = ({ addToast }) => {
                       <button
                         onClick={() => startDeliveryRouteAnimation(delivery)}
                         disabled={animatedDeliveryId !== null}
-                        className="btn btn-cyan"
+                        className="btn btn-primary"
                         style={{
                           padding: '6px 12px',
                           fontSize: '11px',
@@ -282,8 +282,8 @@ export const DeliveryDashboard: React.FC<DeliveryProps> = ({ addToast }) => {
         </div>
 
         {/* Dynamic SVG Map */}
-        <div style={{ background: '#0B0E17', borderRadius: '16px', border: '1px solid var(--glass-border)', overflow: 'hidden', height: '400px', position: 'relative' }}>
-          <svg width="100%" height="100%" viewBox="0 0 600 500" style={{ background: '#080C14' }}>
+        <div style={{ background: 'var(--bg-secondary)', borderRadius: '16px', border: '1px solid var(--glass-border)', overflow: 'hidden', height: '400px', position: 'relative' }}>
+          <svg width="100%" height="100%" viewBox="0 0 600 500" style={{ background: 'var(--bg-secondary)' }}>
             
             {/* Grid background lines */}
             <defs>

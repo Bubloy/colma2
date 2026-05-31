@@ -143,7 +143,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ addToast }) => {
           <div className="glass-card accent-danger" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ textAlign: 'center', padding: '20px 0' }}>
               <span style={{ fontSize: '48px' }}>🔒</span>
-              <h3 style={{ color: '#FFF', fontSize: '20px', marginTop: '10px' }}>Caja Registradora Cerrada</h3>
+              <h3 style={{ color: 'var(--text-primary)', fontSize: '20px', marginTop: '10px' }}>Caja Registradora Cerrada</h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '12px', marginTop: '6px', lineHeight: '1.4' }}>
                 Para facturar productos en el Punto de Venta (POS), debes abrir la caja registradora ingresando el fondo de sencillo inicial.
               </p>
@@ -163,7 +163,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ addToast }) => {
                 />
               </div>
 
-              <button type="submit" className="btn btn-cyan" style={{ width: '100%', height: '40px', fontSize: '13px' }}>
+              <button type="submit" className="btn btn-primary" style={{ width: '100%', height: '40px', fontSize: '13px' }}>
                 🔓 Abrir Caja Registradora
               </button>
             </form>
@@ -171,7 +171,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ addToast }) => {
         ) : (
           <div className="glass-card accent-success" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ fontSize: '18px', color: '#FFF', margin: 0 }}>Caja Abierta (Cuadre Activo)</h3>
+              <h3 style={{ fontSize: '18px', color: 'var(--text-primary)', margin: 0 }}>Caja Abierta (Cuadre Activo)</h3>
               <span className="badge badge-success">Activa</span>
             </div>
             
@@ -209,7 +209,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ addToast }) => {
 
             {/* Close register form */}
             <form onSubmit={handleCloseRegister} style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '8px' }}>
-              <h4 style={{ fontSize: '13px', color: '#FFF' }}>Cerrar Turno y Cuadrar Caja</h4>
+              <h4 style={{ fontSize: '13px', color: 'var(--text-primary)' }}>Cerrar Turno y Cuadrar Caja</h4>
               <div className="form-group" style={{ marginBottom: '6px' }}>
                 <label>Gastos Operativos Declarados (RD$):</label>
                 <input
@@ -257,7 +257,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ addToast }) => {
         
         {/* Analytics stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
-          <div className="glass-card accent-cyan" style={{ textAlign: 'center', padding: '16px' }}>
+          <div className="glass-card accent-primary" style={{ textAlign: 'center', padding: '16px' }}>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Ventas Brutas Totales</div>
             <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-accent)' }}>RD$ {totalSales}</div>
           </div>
@@ -276,8 +276,8 @@ export const Analytics: React.FC<AnalyticsProps> = ({ addToast }) => {
           
           {/* Chart 1: Hourly Peak Sales line chart */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <h4 style={{ fontSize: '14px', color: '#FFF' }}>Horas Pico de Venta</h4>
-            <div style={{ background: '#080C14', borderRadius: '12px', border: '1px solid var(--glass-border)', padding: '10px', height: '180px' }}>
+            <h4 style={{ fontSize: '14px', color: 'var(--text-primary)' }}>Horas Pico de Venta</h4>
+            <div style={{ background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--glass-border)', padding: '10px', height: '180px' }}>
               <svg width="100%" height="100%" viewBox="0 0 300 150">
                 {/* Horizontal grid lines */}
                 <line x1="20" y1="20" x2="280" y2="20" stroke="rgba(255,255,255,0.03)" />
@@ -310,8 +310,8 @@ export const Analytics: React.FC<AnalyticsProps> = ({ addToast }) => {
 
           {/* Chart 2: Top Selling Products bar chart */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <h4 style={{ fontSize: '14px', color: '#FFF' }}>Top Artículos Vendidos</h4>
-            <div style={{ background: '#080C14', borderRadius: '12px', border: '1px solid var(--glass-border)', padding: '12px', height: '180px', display: 'flex', flexDirection: 'column', gap: '10px', justifyContent: 'center' }}>
+            <h4 style={{ fontSize: '14px', color: 'var(--text-primary)' }}>Top Artículos Vendidos</h4>
+            <div style={{ background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--glass-border)', padding: '12px', height: '180px', display: 'flex', flexDirection: 'column', gap: '10px', justifyContent: 'center' }}>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '2px' }}>
                   <span>Presidente Grande</span>
@@ -346,7 +346,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ addToast }) => {
 
         {/* Fiscal DGII Report Center */}
         <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <h3 style={{ fontSize: '18px', color: '#FFF' }}>Centro Fiscal DGII RD</h3>
+          <h3 style={{ fontSize: '18px', color: 'var(--text-primary)' }}>Centro Fiscal DGII RD</h3>
           <p style={{ color: 'var(--text-secondary)', fontSize: '12px', lineHeight: '1.4' }}>
             Compila y descarga los archivos de Comprobantes Fiscales Electrónicos. Estos archivos CSV corresponden exactamente a las especificaciones y normativas vigentes en la República Dominicana para la declaración de compras (606) y ventas (607).
           </p>
@@ -354,15 +354,15 @@ export const Analytics: React.FC<AnalyticsProps> = ({ addToast }) => {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '10px' }}>
             <div className="glass-card" style={{ background: 'rgba(255,255,255,0.01)', border: '1px dashed var(--glass-border)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '140px' }}>
               <div>
-                <span className="badge badge-cyan" style={{ marginBottom: '6px' }}>Ventas</span>
-                <h4 style={{ color: '#FFF', fontSize: '15px' }}>Formato DGII 607</h4>
+                <span className="badge badge-primary" style={{ marginBottom: '6px' }}>Ventas</span>
+                <h4 style={{ color: 'var(--text-primary)', fontSize: '15px' }}>Formato DGII 607</h4>
                 <p style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px' }}>
                   Reporte mensual de ventas de bienes y servicios emitidos con comprobantes NCF.
                 </p>
               </div>
               <button
                 onClick={export607CSV}
-                className="btn btn-cyan"
+                className="btn btn-primary"
                 style={{ width: '100%', padding: '8px', fontSize: '12px', marginTop: '12px' }}
               >
                 📥 Exportar 607 (.csv)
@@ -372,7 +372,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ addToast }) => {
             <div className="glass-card" style={{ background: 'rgba(255,255,255,0.01)', border: '1px dashed var(--glass-border)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '140px' }}>
               <div>
                 <span className="badge badge-purple" style={{ marginBottom: '6px' }}>Compras</span>
-                <h4 style={{ color: '#FFF', fontSize: '15px' }}>Formato DGII 606</h4>
+                <h4 style={{ color: 'var(--text-primary)', fontSize: '15px' }}>Formato DGII 606</h4>
                 <p style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px' }}>
                   Reporte de costos y gastos operativos incurridos con suplidores locales.
                 </p>
@@ -395,7 +395,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ addToast }) => {
         <div className="modal-overlay">
           <div className="modal-content" style={{ maxWidth: '600px' }}>
             <button onClick={() => setShowHistoryModal(false)} className="modal-close">×</button>
-            <h3 style={{ marginBottom: '20px', color: '#FFF' }}>Historial de Cuadros Cerrados</h3>
+            <h3 style={{ marginBottom: '20px', color: 'var(--text-primary)' }}>Historial de Cuadros Cerrados</h3>
             
             <div className="table-container" style={{ background: 'rgba(0,0,0,0.1)', borderRadius: '12px', border: '1px solid var(--glass-border)', maxHeight: '350px', overflowY: 'auto' }}>
               {state.journals.filter(j => j.closedAt).length === 0 ? (

@@ -168,7 +168,7 @@ export const FiaoManager: React.FC<FiaoManagerProps> = ({ addToast }) => {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <div style={{ fontWeight: 'bold', fontSize: '14px', color: '#FFF' }}>
+                  <div style={{ fontWeight: 'bold', fontSize: '14px', color: 'var(--text-primary)' }}>
                     {client.nickname || client.name}
                   </div>
                   <div style={{ fontWeight: 'bold', fontSize: '14px', color: statusColor }}>
@@ -202,7 +202,7 @@ export const FiaoManager: React.FC<FiaoManagerProps> = ({ addToast }) => {
           <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', borderBottom: '1px solid var(--glass-border)', paddingBottom: '16px' }}>
               <div>
-                <h3 style={{ fontSize: '24px', color: '#FFF' }}>{selectedClient.name}</h3>
+                <h3 style={{ fontSize: '24px', color: 'var(--text-primary)' }}>{selectedClient.name}</h3>
                 {selectedClient.nickname && (
                   <p style={{ color: 'var(--color-purple)', fontWeight: 'bold', fontSize: '14px' }}>
                     Apodo: "{selectedClient.nickname}"
@@ -251,7 +251,7 @@ export const FiaoManager: React.FC<FiaoManagerProps> = ({ addToast }) => {
 
             {/* Transactions History */}
             <div>
-              <h4 style={{ fontSize: '16px', color: '#FFF', marginBottom: '10px' }}>Historial de Deuda y Abonos</h4>
+              <h4 style={{ fontSize: '16px', color: 'var(--text-primary)', marginBottom: '10px' }}>Historial de Deuda y Abonos</h4>
               <div className="table-container" style={{ background: 'rgba(0,0,0,0.1)', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
                 {clientTransactions.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '30px', color: 'var(--text-tertiary)' }}>
@@ -308,7 +308,7 @@ export const FiaoManager: React.FC<FiaoManagerProps> = ({ addToast }) => {
         <div className="modal-overlay">
           <div className="modal-content">
             <button onClick={() => setShowAddModal(false)} className="modal-close">×</button>
-            <h3 style={{ marginBottom: '20px', color: '#FFF' }}>Registrar Nuevo Cliente (Fiazo)</h3>
+            <h3 style={{ marginBottom: '20px', color: 'var(--text-primary)' }}>Registrar Nuevo Cliente (Fiazo)</h3>
             <form onSubmit={handleAddClient}>
               <div className="form-group">
                 <label>Nombre Completo:</label>
@@ -371,7 +371,7 @@ export const FiaoManager: React.FC<FiaoManagerProps> = ({ addToast }) => {
         <div className="modal-overlay">
           <div className="modal-content">
             <button onClick={() => setShowAbonoModal(false)} className="modal-close">×</button>
-            <h3 style={{ marginBottom: '10px', color: '#FFF' }}>Registrar Abono</h3>
+            <h3 style={{ marginBottom: '10px', color: 'var(--text-primary)' }}>Registrar Abono</h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginBottom: '20px' }}>
               Registra un pago para abonar a la cuenta de <strong>{selectedClient.nickname || selectedClient.name}</strong>.
               <br />
@@ -410,8 +410,8 @@ export const FiaoManager: React.FC<FiaoManagerProps> = ({ addToast }) => {
           <div className="modal-content" style={{ maxWidth: '380px', padding: '0px', overflow: 'hidden', borderRadius: '24px', border: '1px solid rgba(0,230,118,0.2)' }}>
             
             {/* Phone Screen Top Header */}
-            <div style={{ background: '#075E54', color: '#FFF', padding: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ background: '#FFF', color: '#075E54', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '16px' }}>
+            <div style={{ background: '#075E54', color: 'var(--text-primary)', padding: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ background: 'var(--text-primary)', color: '#075E54', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '16px' }}>
                 {selectedClient.nickname ? selectedClient.nickname.charAt(0) : selectedClient.name.charAt(0)}
               </div>
               <div>
@@ -454,7 +454,7 @@ export const FiaoManager: React.FC<FiaoManagerProps> = ({ addToast }) => {
             </div>
 
             {/* Phone Bottom Actions */}
-            <div style={{ background: '#FFF', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid #DDD' }}>
+            <div style={{ background: 'var(--text-primary)', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid #DDD' }}>
               <div style={{ fontSize: '11px', color: '#666', textAlign: 'center' }}>
                 Simular envío automático a <strong>{selectedClient.phone}</strong>
               </div>

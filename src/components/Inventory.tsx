@@ -132,14 +132,14 @@ export const Inventory: React.FC<InventoryProps> = ({ addToast }) => {
       <div style={{ display: 'flex', gap: '10px', borderBottom: '1px solid var(--glass-border)', paddingBottom: '12px' }}>
         <button
           onClick={() => setActiveTab('catalog')}
-          className={`btn ${activeTab === 'catalog' ? 'btn-cyan' : 'btn-secondary'}`}
+          className={`btn ${activeTab === 'catalog' ? 'btn-primary' : 'btn-secondary'}`}
           style={{ padding: '8px 16px', fontSize: '13px' }}
         >
           📋 Catálogo de Productos
         </button>
         <button
           onClick={() => setActiveTab('suppliers')}
-          className={`btn ${activeTab === 'suppliers' ? 'btn-cyan' : 'btn-secondary'}`}
+          className={`btn ${activeTab === 'suppliers' ? 'btn-primary' : 'btn-secondary'}`}
           style={{ padding: '8px 16px', fontSize: '13px' }}
         >
           🚚 Órdenes de Suplidores
@@ -169,7 +169,7 @@ export const Inventory: React.FC<InventoryProps> = ({ addToast }) => {
           <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
               <h2 style={{ margin: 0, fontSize: '20px' }}>Catálogo de Almacén</h2>
-              <button onClick={handleOpenAdd} className="btn btn-cyan" style={{ padding: '8px 16px', fontSize: '13px' }}>
+              <button onClick={handleOpenAdd} className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '13px' }}>
                 + Agregar Nuevo Producto
               </button>
             </div>
@@ -221,7 +221,7 @@ export const Inventory: React.FC<InventoryProps> = ({ addToast }) => {
                     return (
                       <tr key={p.id}>
                         <td style={{ fontFamily: 'monospace', fontSize: '12px', color: 'var(--text-secondary)' }}>{p.barcode}</td>
-                        <td style={{ fontWeight: 'bold', color: '#FFF' }}>{p.name}</td>
+                        <td style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>{p.name}</td>
                         <td>{p.category}</td>
                         <td style={{ textAlign: 'center' }}>
                           <span className={`badge ${isLow ? 'badge-danger' : 'badge-success'}`} style={{ minWidth: '45px', textAlign: 'center' }}>
@@ -275,7 +275,7 @@ export const Inventory: React.FC<InventoryProps> = ({ addToast }) => {
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                      <span style={{ fontWeight: 'bold', color: '#FFF', fontSize: '16px' }}>{s.name}</span>
+                      <span style={{ fontWeight: 'bold', color: 'var(--text-primary)', fontSize: '16px' }}>{s.name}</span>
                       <span className="badge badge-purple">{s.id}</span>
                     </div>
                     <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Distribuye: {s.desc}</p>
@@ -291,7 +291,7 @@ export const Inventory: React.FC<InventoryProps> = ({ addToast }) => {
             </div>
           </div>
 
-          <div className="glass-card accent-cyan" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div className="glass-card accent-primary" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <div>
               <h3>Generar Orden de Compra</h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '12px', margin: '8px 0 20px 0', lineHeight: '1.4' }}>
@@ -320,7 +320,7 @@ export const Inventory: React.FC<InventoryProps> = ({ addToast }) => {
                   </select>
                 </div>
 
-                <button type="submit" className="btn btn-cyan" style={{ width: '100%', height: '42px', fontSize: '14px', marginTop: '10px' }}>
+                <button type="submit" className="btn btn-primary" style={{ width: '100%', height: '42px', fontSize: '14px', marginTop: '10px' }}>
                   ⚡ Confirmar Compra y Reabastecer
                 </button>
               </form>
@@ -339,7 +339,7 @@ export const Inventory: React.FC<InventoryProps> = ({ addToast }) => {
         <div className="modal-overlay">
           <div className="modal-content">
             <button onClick={() => setShowProductModal(false)} className="modal-close">×</button>
-            <h3 style={{ marginBottom: '20px', color: '#FFF' }}>
+            <h3 style={{ marginBottom: '20px', color: 'var(--text-primary)' }}>
               {editingProduct ? 'Editar Producto de Almacén' : 'Agregar Nuevo Producto'}
             </h3>
             
@@ -435,7 +435,7 @@ export const Inventory: React.FC<InventoryProps> = ({ addToast }) => {
               </div>
 
               <div style={{ display: 'flex', gap: '10px', marginTop: '24px' }}>
-                <button type="submit" className="btn btn-cyan" style={{ flex: 1 }}>
+                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
                   {editingProduct ? 'Actualizar Producto' : 'Crear Producto'}
                 </button>
                 <button type="button" onClick={() => setShowProductModal(false)} className="btn btn-secondary" style={{ flex: 1 }}>
