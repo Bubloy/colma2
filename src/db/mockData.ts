@@ -18,6 +18,15 @@ export interface Client {
   balance: number;
 }
 
+export interface ColmadoSettings {
+  isRegistered: boolean;
+  name: string;
+  rnc: string;
+  phone: string;
+  address: string;
+  adminPin: string;
+}
+
 export interface SaleItem {
   productId: string;
   name: string;
@@ -30,8 +39,8 @@ export interface Sale {
   timestamp: string;
   items: SaleItem[];
   total: number;
-  paymentMethod: 'Efectivo' | 'Tarjeta' | 'Transferencia' | 'Fiao';
-  clientId?: string; // If Fiao
+  paymentMethod: 'Efectivo' | 'Tarjeta' | 'Transferencia' | 'Fiao' | 'Mixto';
+  clientId?: string; // If Fiao or Mixto
   clientName?: string;
   taxType: 'Consumo' | 'Crédito Fiscal' | 'Único';
   ncf?: string; // Comprobante Fiscal DGII
@@ -39,6 +48,12 @@ export interface Sale {
   changeGiven?: number;
   isSynced: boolean;
   deliveryId?: string;
+  paymentSplits?: {
+    cash?: number;
+    card?: number;
+    transfer?: number;
+    fiao?: number;
+  };
 }
 
 export interface Delivery {

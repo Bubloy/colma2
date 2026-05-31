@@ -1,5 +1,5 @@
 import { INITIAL_PRODUCTS, INITIAL_CLIENTS } from './mockData';
-import type { Product, Client, Sale, Delivery, CashJournal } from './mockData';
+import type { Product, Client, Sale, Delivery, CashJournal, ColmadoSettings } from './mockData';
 
 export interface AppState {
   products: Product[];
@@ -11,6 +11,7 @@ export interface AppState {
   offlineQueue: Sale[];
   activeRole: 'Super Admin' | 'Cajero' | 'Delivery';
   currentJournalId: string | null;
+  colmadoSettings: ColmadoSettings;
 }
 
 type Listener = (state: AppState) => void;
@@ -39,6 +40,7 @@ class StateStore {
     const onlineJson = localStorage.getItem('colma2_is_online');
     const queueJson = localStorage.getItem('colma2_offline_queue');
     const currentJournalId = localStorage.getItem('colma2_current_journal_id');
+    const settingsJson = localStorage.getItem('colma2_settings');
 
     const products = productsJson ? JSON.parse(productsJson) : INITIAL_PRODUCTS;
     const clients = clientsJson ? JSON.parse(clientsJson) : INITIAL_CLIENTS;
@@ -48,6 +50,16 @@ class StateStore {
     const activeRole = (roleJson ? JSON.parse(roleJson) : 'Super Admin') as AppState['activeRole'];
     const isOnline = onlineJson ? JSON.parse(onlineJson) === true : true;
     const offlineQueue = queueJson ? JSON.parse(queueJson) : [];
+    
+    const defaultSettings: ColmadoSettings = {
+      isRegistered: false,
+      name: '',
+      rnc: '',
+      phone: '',
+      address: '',
+      adminPin: '1234'
+    };
+    const colmadoSettings = settingsJson ? JSON.parse(settingsJson) : defaultSettings;
 
     // Ensure we save initial setup if empty
     if (!productsJson) localStorage.setItem('colma2_products', JSON.stringify(products));
@@ -58,6 +70,7 @@ class StateStore {
     if (!roleJson) localStorage.setItem('colma2_active_role', JSON.stringify(activeRole));
     if (!onlineJson) localStorage.setItem('colma2_is_online', JSON.stringify(isOnline));
     if (!queueJson) localStorage.setItem('colma2_offline_queue', JSON.stringify(offlineQueue));
+    if (!settingsJson) localStorage.setItem('colma2_settings', JSON.stringify(colmadoSettings));
 
     return {
       products,
@@ -68,7 +81,8 @@ class StateStore {
       isOnline,
       offlineQueue,
       activeRole,
-      currentJournalId
+      currentJournalId,
+      colmadoSettings
     };
   }
 
@@ -81,6 +95,7 @@ class StateStore {
     localStorage.setItem('colma2_active_role', JSON.stringify(this.state.activeRole));
     localStorage.setItem('colma2_is_online', JSON.stringify(this.state.isOnline));
     localStorage.setItem('colma2_offline_queue', JSON.stringify(this.state.offlineQueue));
+    localStorage.setItem('colma2_settings', JSON.stringify(this.state.colmadoSettings));
     if (this.state.currentJournalId) {
       localStorage.setItem('colma2_current_journal_id', this.state.currentJournalId);
     } else {
@@ -109,6 +124,12 @@ class StateStore {
   // State mutation operations
   public setRole(role: AppState['activeRole']) {
     this.state.activeRole = role;
+    this.saveState();
+    this.notify();
+  }
+
+  public saveColmadoSettings(settings: ColmadoSettings) {
+    this.state.colmadoSettings = settings;
     this.saveState();
     this.notify();
   }
@@ -173,11 +194,15 @@ class StateStore {
       return p;
     });
 
-    // 2. Manage Fiao if balance needed
-    if (newSale.paymentMethod === 'Fiao' && newSale.clientId) {
+    // 2. Manage Fiao / Split payments if balance needed
+    const fiaoAmount = newSale.paymentMethod === 'Fiao' 
+      ? newSale.total 
+      : (newSale.paymentMethod === 'Mixto' ? (newSale.paymentSplits?.fiao || 0) : 0);
+
+    if (fiaoAmount > 0 && newSale.clientId) {
       this.state.clients = this.state.clients.map(c => {
         if (c.id === newSale.clientId) {
-          return { ...c, balance: c.balance + newSale.total };
+          return { ...c, balance: c.balance + fiaoAmount };
         }
         return c;
       });
@@ -197,14 +222,21 @@ class StateStore {
 
     // 4. Update Current Cash Journal
     if (this.state.currentJournalId) {
+      const splits = newSale.paymentSplits || {
+        cash: newSale.paymentMethod === 'Efectivo' ? newSale.total : 0,
+        card: newSale.paymentMethod === 'Tarjeta' ? newSale.total : 0,
+        transfer: newSale.paymentMethod === 'Transferencia' ? newSale.total : 0,
+        fiao: newSale.paymentMethod === 'Fiao' ? newSale.total : 0,
+      };
+
       this.state.journals = this.state.journals.map(j => {
         if (j.id === this.state.currentJournalId) {
           return {
             ...j,
-            salesCash: j.salesCash + (newSale.paymentMethod === 'Efectivo' ? newSale.total : 0),
-            salesCard: j.salesCard + (newSale.paymentMethod === 'Tarjeta' ? newSale.total : 0),
-            salesTransfer: j.salesTransfer + (newSale.paymentMethod === 'Transferencia' ? newSale.total : 0),
-            salesFiao: j.salesFiao + (newSale.paymentMethod === 'Fiao' ? newSale.total : 0)
+            salesCash: j.salesCash + (splits.cash || 0),
+            salesCard: j.salesCard + (splits.card || 0),
+            salesTransfer: j.salesTransfer + (splits.transfer || 0),
+            salesFiao: j.salesFiao + (splits.fiao || 0)
           };
         }
         return j;

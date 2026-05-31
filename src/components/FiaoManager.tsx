@@ -93,7 +93,8 @@ export const FiaoManager: React.FC<FiaoManagerProps> = ({ addToast }) => {
   const getWhatsAppMessage = () => {
     if (!selectedClient) return '';
     const date = new Date().toLocaleDateString('es-DO');
-    return `Hola ${selectedClient.nickname || selectedClient.name}, le saludamos de Colma2. Le recordamos que su balance pendiente de fiao al día de hoy (${date}) es de *RD$ ${selectedClient.balance}* de un límite de RD$ ${selectedClient.creditLimit}.\n\nPuede pasar a abonar por el colmado o solicitar por delivery. ¡Muchas gracias por su preferencia! 🏍️🇩🇴`;
+    const colmadoName = state.colmadoSettings.name || 'Colma2';
+    return `Hola ${selectedClient.nickname || selectedClient.name}, le saludamos de *${colmadoName}*. Le recordamos que su balance pendiente de fiao al día de hoy (${date}) es de *RD$ ${selectedClient.balance}* de un límite de RD$ ${selectedClient.creditLimit}.\n\nPuede pasar a abonar por el colmado o solicitar por delivery. ¡Muchas gracias por su preferencia! 🏍️🇩🇴`;
   };
 
   const triggerRealWhatsApp = () => {

@@ -8,6 +8,7 @@ import DeliveryDashboard from './components/DeliveryDashboard';
 import Analytics from './components/Analytics';
 import RoleSwitcher from './components/RoleSwitcher';
 import OfflineSync from './components/OfflineSync';
+import Onboarding from './components/Onboarding';
 
 interface Toast {
   id: string;
@@ -19,6 +20,10 @@ export function App() {
   const [state, setState] = useState<AppState>(store.getState());
   const [activeTab, setActiveTab] = useState<string>('pos');
   const [toasts, setToasts] = useState<Toast[]>([]);
+
+  if (!state.colmadoSettings.isRegistered) {
+    return <Onboarding />;
+  }
 
   useEffect(() => {
     const unsubscribe = store.subscribe((newState) => {
@@ -96,7 +101,7 @@ export function App() {
               {toast.type === 'warning' && '⚠️'}
               {toast.type === 'danger' && '❌'}
             </span>
-            <div style={{ fontSize: '13px', color: '#FFF', fontWeight: 600 }}>{toast.message}</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 600 }}>{toast.message}</div>
           </div>
         ))}
       </div>
@@ -104,14 +109,14 @@ export function App() {
       {/* Main Header / Navigation */}
       <header>
         <div className="logo-container">
-          <div className="logo-icon">C2</div>
+          <div className="logo-icon">{state.colmadoSettings.name ? state.colmadoSettings.name.charAt(0) : 'C'}</div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span className="logo-text">Colma2</span>
-              <span className="domain-pill">colma2.com</span>
+              <span className="logo-text">{state.colmadoSettings.name || 'Colma2'}</span>
+              <span className="domain-pill" style={{ textTransform: 'uppercase' }}>RNC: {state.colmadoSettings.rnc}</span>
             </div>
             <div style={{ fontSize: '10px', color: 'var(--text-secondary)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              🇩🇴 República Dominicana | <span style={{ color: state.isOnline ? 'var(--color-success)' : 'var(--color-danger)', fontWeight: 'bold' }}>
+              🇩🇴 {state.colmadoSettings.address} | <span style={{ color: state.isOnline ? 'var(--color-success)' : 'var(--color-danger)', fontWeight: 'bold' }}>
                 {state.isOnline ? '● En Línea' : '● Fuera de Línea'}
               </span>
             </div>
@@ -177,14 +182,14 @@ export function App() {
         {/* Global info pill */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#FFF' }}>
-              {state.activeRole === 'Super Admin' ? 'Don César (Dueño)' : state.activeRole === 'Cajero' ? 'Cajera Lorena' : 'Rider Brayan'}
+            <div style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
+              {state.activeRole === 'Super Admin' ? (state.colmadoSettings.name ? `${state.colmadoSettings.name} (Admin)` : 'Administrador') : state.activeRole === 'Cajero' ? 'Cajera Lorena' : 'Rider Brayan'}
             </div>
             <div style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>
               Rol: {state.activeRole}
             </div>
           </div>
-          <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--color-accent) 0%, var(--color-purple) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#0A0E17', fontSize: '18px' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--color-accent) 0%, var(--color-purple) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#FFFFFF', fontSize: '18px', boxShadow: 'var(--shadow-accent)' }}>
             {state.activeRole.charAt(0)}
           </div>
         </div>

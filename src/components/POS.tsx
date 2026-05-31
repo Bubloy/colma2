@@ -13,9 +13,15 @@ export const POS: React.FC<POSProps> = ({ addToast }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [cart, setCart] = useState<{ product: Product; quantity: number }[]>([]);
   const [taxType, setTaxType] = useState<'Consumo' | 'Crédito Fiscal' | 'Único'>('Consumo');
-  const [paymentMethod, setPaymentMethod] = useState<'Efectivo' | 'Tarjeta' | 'Transferencia' | 'Fiao'>('Efectivo');
+  const [paymentMethod, setPaymentMethod] = useState<'Efectivo' | 'Tarjeta' | 'Transferencia' | 'Fiao' | 'Mixto'>('Efectivo');
   const [cashReceived, setCashReceived] = useState<number | ''>('');
   const [selectedClientId, setSelectedClientId] = useState<string>('');
+  
+  // Split payment state
+  const [splitCash, setSplitCash] = useState<number | ''>('');
+  const [splitCard, setSplitCard] = useState<number | ''>('');
+  const [splitTransfer, setSplitTransfer] = useState<number | ''>('');
+  const [splitFiao, setSplitFiao] = useState<number | ''>('');
   
   // Ticket Modal state
   const [showTicket, setShowTicket] = useState(false);
@@ -39,7 +45,7 @@ export const POS: React.FC<POSProps> = ({ addToast }) => {
   const categories = ['Todos', 'Bebidas', 'Embutidos', 'Víveres', 'Despensa', 'Limpieza'];
 
   // Add to cart
-  const addToCart = (product: Product) => {
+  const addToCart = (product: Product, qty: number = 1) => {
     if (product.stock <= 0) {
       addToast(`¡Sin existencias de ${product.name}!`, 'danger');
       return;
@@ -48,18 +54,19 @@ export const POS: React.FC<POSProps> = ({ addToast }) => {
     setCart((prevCart) => {
       const existing = prevCart.find((item) => item.product.id === product.id);
       const currentQty = existing ? existing.quantity : 0;
+      const targetQty = currentQty + qty;
       
-      if (currentQty >= product.stock) {
+      if (targetQty > product.stock) {
         addToast(`No puedes vender más del stock actual (${product.stock} unidades)`, 'warning');
         return prevCart;
       }
 
       if (existing) {
         return prevCart.map((item) =>
-          item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.product.id === product.id ? { ...item, quantity: parseFloat(targetQty.toFixed(3)) } : item
         );
       } else {
-        return [...prevCart, { product, quantity: 1 }];
+        return [...prevCart, { product, quantity: parseFloat(qty.toFixed(3)) }];
       }
     });
   };
@@ -70,7 +77,7 @@ export const POS: React.FC<POSProps> = ({ addToast }) => {
       const existing = prevCart.find((item) => item.product.id === productId);
       if (existing && existing.quantity > 1) {
         return prevCart.map((item) =>
-          item.product.id === productId ? { ...item, quantity: item.quantity - 1 } : item
+          item.product.id === productId ? { ...item, quantity: parseFloat((existing.quantity - 1).toFixed(3)) } : item
         );
       } else {
         return prevCart.filter((item) => item.product.id !== productId);
@@ -94,10 +101,27 @@ export const POS: React.FC<POSProps> = ({ addToast }) => {
 
   // Selected client for fiao
   const selectedClient = state.clients.find((c) => c.id === selectedClientId);
-  const isOverCreditLimit = selectedClient ? (selectedClient.balance + total > selectedClient.creditLimit) : false;
+  const fiaoPortion = paymentMethod === 'Fiao' ? total : (paymentMethod === 'Mixto' ? (Number(splitFiao) || 0) : 0);
+  const isOverCreditLimit = selectedClient ? (selectedClient.balance + fiaoPortion > selectedClient.creditLimit) : false;
 
   // Simulated Barcode Scanner trigger
   const handleBarcodeScanSimulate = (barcode: string) => {
+    // Check for balanza barcode (starts with 20 or 24, length 13)
+    if ((barcode.startsWith('20') || barcode.startsWith('24')) && barcode.length === 13) {
+      const pluDigits = barcode.substring(2, 7);
+      const weightDigits = barcode.substring(7, 12);
+      
+      const productId = 'p' + parseInt(pluDigits, 10);
+      const weight = parseFloat(weightDigits) / 1000; // divided by 1000 to get weight in lbs (e.g. 01250 -> 1.25 lb)
+      
+      const product = state.products.find(p => p.id === productId);
+      if (product) {
+        addToCart(product, weight);
+        addToast(`Balanza: ${product.name} - ${weight.toFixed(3)} Lb`, 'success');
+        return;
+      }
+    }
+
     const product = state.products.find(p => p.barcode === barcode);
     if (product) {
       addToCart(product);
@@ -137,6 +161,29 @@ export const POS: React.FC<POSProps> = ({ addToast }) => {
       }
     }
 
+    if (paymentMethod === 'Mixto') {
+      const cash = Number(splitCash) || 0;
+      const card = Number(splitCard) || 0;
+      const transfer = Number(splitTransfer) || 0;
+      const fiao = Number(splitFiao) || 0;
+      const splitTotal = cash + card + transfer + fiao;
+      
+      if (Math.abs(splitTotal - total) > 0.01) {
+        addToast(`La suma de los pagos (RD$ ${splitTotal.toFixed(2)}) debe ser igual al total de la venta (RD$ ${total.toFixed(2)})`, 'warning');
+        return;
+      }
+
+      if (fiao > 0) {
+        if (!selectedClientId) {
+          addToast('Selecciona un cliente para la porción de Fiao', 'warning');
+          return;
+        }
+        if (isOverCreditLimit) {
+          addToast(`⚠️ Límite de crédito superado para la porción de fiao de ${selectedClient?.nickname}`, 'danger');
+        }
+      }
+    }
+
     // Prepare sale items
     const saleItems = cart.map((item) => ({
       productId: item.product.id,
@@ -150,10 +197,16 @@ export const POS: React.FC<POSProps> = ({ addToast }) => {
         items: saleItems,
         total,
         paymentMethod,
-        clientId: paymentMethod === 'Fiao' ? selectedClientId : undefined,
+        clientId: (paymentMethod === 'Fiao' || (paymentMethod === 'Mixto' && (Number(splitFiao) || 0) > 0)) ? selectedClientId : undefined,
         taxType,
-        cashReceived: paymentMethod === 'Efectivo' ? Number(cashReceived) : undefined,
-        changeGiven: paymentMethod === 'Efectivo' ? changeGiven : undefined
+        cashReceived: paymentMethod === 'Efectivo' ? Number(cashReceived) : (paymentMethod === 'Mixto' ? Number(splitCash) || undefined : undefined),
+        changeGiven: paymentMethod === 'Efectivo' ? changeGiven : undefined,
+        paymentSplits: paymentMethod === 'Mixto' ? {
+          cash: Number(splitCash) || 0,
+          card: Number(splitCard) || 0,
+          transfer: Number(splitTransfer) || 0,
+          fiao: Number(splitFiao) || 0
+        } : undefined
       });
 
       // Show receipt
@@ -167,6 +220,10 @@ export const POS: React.FC<POSProps> = ({ addToast }) => {
       setCart([]);
       setCashReceived('');
       setSelectedClientId('');
+      setSplitCash('');
+      setSplitCard('');
+      setSplitTransfer('');
+      setSplitFiao('');
     } catch (err) {
       addToast('Error al procesar la venta', 'danger');
     }
@@ -329,8 +386,93 @@ export const POS: React.FC<POSProps> = ({ addToast }) => {
                 <option value="Tarjeta">💳 Tarjeta / mPOS</option>
                 <option value="Transferencia">🏦 Transferencia</option>
                 <option value="Fiao">✍️ El Fiao</option>
+                <option value="Mixto">🔀 Pago Mixto</option>
               </select>
             </div>
+
+            {/* Split payment inputs */}
+            {paymentMethod === 'Mixto' && (
+              <div style={{ background: 'rgba(99, 102, 241, 0.05)', padding: '12px', borderRadius: '12px', marginBottom: '10px', border: '1px solid rgba(99, 102, 241, 0.2)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 'bold', borderBottom: '1px dashed var(--glass-border)', paddingBottom: '6px', marginBottom: '4px' }}>
+                  <span>Distribución de Pago</span>
+                  <span style={{ color: Math.abs(((Number(splitCash) || 0) + (Number(splitCard) || 0) + (Number(splitTransfer) || 0) + (Number(splitFiao) || 0)) - total) < 0.01 ? 'var(--color-success)' : 'var(--color-danger)' }}>
+                    RD$ {((Number(splitCash) || 0) + (Number(splitCard) || 0) + (Number(splitTransfer) || 0) + (Number(splitFiao) || 0)).toFixed(2)} / {total.toFixed(2)}
+                  </span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label style={{ fontSize: '11px' }}>💵 Efectivo:</label>
+                    <input
+                      type="number"
+                      value={splitCash}
+                      onChange={(e) => setSplitCash(e.target.value ? Number(e.target.value) : '')}
+                      className="form-control"
+                      placeholder="0.00"
+                      style={{ height: '30px', padding: '4px 8px', fontSize: '12px' }}
+                    />
+                  </div>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label style={{ fontSize: '11px' }}>💳 Tarjeta:</label>
+                    <input
+                      type="number"
+                      value={splitCard}
+                      onChange={(e) => setSplitCard(e.target.value ? Number(e.target.value) : '')}
+                      className="form-control"
+                      placeholder="0.00"
+                      style={{ height: '30px', padding: '4px 8px', fontSize: '12px' }}
+                    />
+                  </div>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label style={{ fontSize: '11px' }}>🏦 Transferencia:</label>
+                    <input
+                      type="number"
+                      value={splitTransfer}
+                      onChange={(e) => setSplitTransfer(e.target.value ? Number(e.target.value) : '')}
+                      className="form-control"
+                      placeholder="0.00"
+                      style={{ height: '30px', padding: '4px 8px', fontSize: '12px' }}
+                    />
+                  </div>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label style={{ fontSize: '11px' }}>✍️ El Fiao:</label>
+                    <input
+                      type="number"
+                      value={splitFiao}
+                      onChange={(e) => setSplitFiao(e.target.value ? Number(e.target.value) : '')}
+                      className="form-control"
+                      placeholder="0.00"
+                      style={{ height: '30px', padding: '4px 8px', fontSize: '12px' }}
+                    />
+                  </div>
+                </div>
+                {(Number(splitFiao) || 0) > 0 && (
+                  <div className="form-group" style={{ marginTop: '4px', marginBottom: 0 }}>
+                    <label style={{ fontSize: '11px' }}>Seleccionar Cliente Deudor:</label>
+                    <select
+                      value={selectedClientId}
+                      onChange={(e) => setSelectedClientId(e.target.value)}
+                      className="form-control"
+                      style={{ height: '32px', padding: '4px 8px', fontSize: '12px' }}
+                    >
+                      <option value="">-- Elegir Cliente --</option>
+                      {state.clients.map(c => (
+                        <option key={c.id} value={c.id}>
+                          {c.nickname || c.name} (Saldo: RD$ {c.balance})
+                        </option>
+                      ))}
+                    </select>
+                    {selectedClient && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                        <span>Límite Crédito: RD$ {selectedClient.creditLimit}</span>
+                        <span style={{ color: isOverCreditLimit ? 'var(--color-danger)' : 'var(--color-success)', fontWeight: 'bold' }}>
+                          Proyectado: RD$ {selectedClient.balance + (Number(splitFiao) || 0)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Conditionally render details based on payment method */}
             {paymentMethod === 'Efectivo' && (
@@ -431,12 +573,11 @@ export const POS: React.FC<POSProps> = ({ addToast }) => {
             
             <div className="ticket-container" style={{ boxShadow: 'none', border: '1px solid #CCC' }}>
               <div className="ticket-header">
-                <h3 style={{ fontStyle: 'italic', fontWeight: 900, fontSize: '20px', color: '#000' }}>COLMA2</h3>
-                <p style={{ fontSize: '10px' }}>colma2.com</p>
-                <p style={{ fontSize: '9px' }}>El Colmado Inteligente S.R.L.</p>
-                <p style={{ fontSize: '9px' }}>Av. Winston Churchill, Santo Domingo, RD</p>
-                <p style={{ fontSize: '9px' }}>RNC: 1-31-12345-6</p>
-                <p style={{ fontSize: '9px' }}>Tel: 809-555-0101</p>
+                <h3 style={{ fontStyle: 'italic', fontWeight: 900, fontSize: '20px', color: '#000', textTransform: 'uppercase' }}>{state.colmadoSettings.name || 'COLMA2'}</h3>
+                <p style={{ fontSize: '10px' }}>Punto de Venta Inteligente</p>
+                <p style={{ fontSize: '9px' }}>{state.colmadoSettings.address}</p>
+                <p style={{ fontSize: '9px' }}>RNC: {state.colmadoSettings.rnc}</p>
+                <p style={{ fontSize: '9px' }}>Tel: {state.colmadoSettings.phone}</p>
               </div>
 
               <div className="ticket-divider"></div>
@@ -489,8 +630,8 @@ export const POS: React.FC<POSProps> = ({ addToast }) => {
 
               <div className="ticket-divider"></div>
 
-              <div style={{ fontSize: '9px', textAlign: 'center' }}>
-                <div>MÉTODO: {lastSale.paymentMethod}</div>
+               <div style={{ fontSize: '9px', textAlign: 'center' }}>
+                <div>MÉTODO: {lastSale.paymentMethod === 'Mixto' ? 'PAGO MIXTO' : lastSale.paymentMethod}</div>
                 {lastSale.paymentMethod === 'Efectivo' && (
                   <>
                     <div>EFECTIVO: RD$ {lastSale.cashReceived}</div>
@@ -499,6 +640,14 @@ export const POS: React.FC<POSProps> = ({ addToast }) => {
                 )}
                 {lastSale.paymentMethod === 'Fiao' && (
                   <div style={{ fontWeight: 'bold' }}>DEUDOR: {lastSale.clientName}</div>
+                )}
+                {lastSale.paymentMethod === 'Mixto' && lastSale.paymentSplits && (
+                  <div style={{ textAlign: 'left', padding: '0 20px', marginTop: '4px', borderTop: '1px dashed #000', paddingTop: '4px' }}>
+                    {(lastSale.paymentSplits.cash || 0) > 0 && <div>• Efectivo: RD$ {lastSale.paymentSplits.cash}</div>}
+                    {(lastSale.paymentSplits.card || 0) > 0 && <div>• Tarjeta: RD$ {lastSale.paymentSplits.card}</div>}
+                    {(lastSale.paymentSplits.transfer || 0) > 0 && <div>• Transfer: RD$ {lastSale.paymentSplits.transfer}</div>}
+                    {(lastSale.paymentSplits.fiao || 0) > 0 && <div style={{ fontWeight: 'bold' }}>• Fiao ({lastSale.clientName}): RD$ {lastSale.paymentSplits.fiao}</div>}
+                  </div>
                 )}
               </div>
 
